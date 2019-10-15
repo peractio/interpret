@@ -843,6 +843,7 @@ class BaseEBM(BaseEstimator):
         estimators = []
         for i in range(self.n_estimators):
             estimator = clone(proto_estimator)
+            # Yulong: why is random state + i?? ohh to make it random in different ways
             estimator.set_params(random_state=self.random_state + i)
             estimators.append(estimator)
 
@@ -855,6 +856,7 @@ class BaseEBM(BaseEstimator):
             (estimators[i], X, y) for i in range(self.n_estimators)
         )
 
+        # Yulong: so each estimator is just part of the bagged ensemble, but there isn't boosting in between?
         estimators = provider.parallel(train_model, train_model_args_iter)
 
         if isinstance(self.interactions, int) and self.interactions > 0:
