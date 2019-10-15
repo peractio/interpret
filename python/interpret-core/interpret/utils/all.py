@@ -16,6 +16,7 @@ except ImportError:  # pragma: no cover
 
 from pandas.core.generic import NDFrame
 from pandas.core.series import Series
+import numpy as np
 
 import logging
 
@@ -290,10 +291,24 @@ def unify_data(data, labels=None, feature_names=None, feature_types=None):
             new_feature_types = feature_types
     else:  # pragma: no cover
         msg = "Could not unify data of type: {0}".format(type(data))
-        log.warning(msg)
-        raise Exception(msg)
+        log.error(msg)
+        raise ValueError(msg)
 
     new_labels = unify_vector(labels)
+
+    # NOTE: Until missing handling is introduced, all methods will fail at data unification stage if present.
+    new_data_has_na = (
+        True if new_data is not None and pd.isnull(new_data).any() else False
+    )
+    new_labels_has_na = (
+        True if new_labels is not None and pd.isnull(new_labels).any() else False
+    )
+
+    if new_data_has_na or new_labels_has_na:
+        msg = "Missing values are currently not supported."
+        log.error(msg)
+        raise ValueError(msg)
+
     return new_data, new_labels, new_feature_names, new_feature_types
 
 
@@ -329,7 +344,7 @@ def autogen_schema(X, ordinal_max_items=2, feature_names=None, feature_types=Non
             X = X.infer_objects()
         except AttributeError:
             for k in list(X):
-                X[k] = pd.to_numeric(X[k], errors='ignore')
+                X[k] = pd.to_numeric(X[k], errors="ignore")
 
     if isinstance(X, NDFrame):
         for name, col_dtype in zip(X.dtypes.index, X.dtypes):

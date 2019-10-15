@@ -19,7 +19,7 @@ if [ "$os_type" = "Darwin" ]; then
    # reference on rpath & install_name: https://www.mikeash.com/pyblog/friday-qa-2009-11-06-linking-and-install-names.html
 
    # try moving some of these clang specific warnings into compile_all if g++ eventually supports them
-   compile_mac="$compile_all -Wnull-dereference -dynamiclib"
+   compile_mac="$compile_all -Wnull-dereference -Wgnu-zero-variadic-macro-arguments -dynamiclib"
 
    printf "%s\n" "Creating initial directories"
    [ -d "$root_path/staging" ] || mkdir -p "$root_path/staging"

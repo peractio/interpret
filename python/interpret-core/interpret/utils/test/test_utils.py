@@ -3,6 +3,7 @@
 
 import pytest
 import numpy as np
+import pandas as pd
 from .. import gen_feat_val_list, gen_name_from_class
 from .. import reverse_map, unify_data
 
@@ -10,6 +11,28 @@ from .. import reverse_map, unify_data
 @pytest.fixture
 def fixture_feat_val_list():
     return [("race", 3), ("age", -2), ("gender", 1)]
+
+
+def test_unify_fails_on_missing():
+    orig_data = np.array([[1, 2], [3, np.nan]])
+    orig_labels = np.array([0, 1])
+
+    with pytest.raises(ValueError):
+        unify_data(orig_data, orig_labels)
+
+
+def test_unify_dataframe_smoke():
+    df = pd.DataFrame()
+    df["f1"] = [1.5, "a"]
+    df["f2"] = [3, "b"]
+    df["label"] = [0, 1]
+
+    train_cols = df.columns[0:-1]
+    label = df.columns[-1]
+    X = df[train_cols]
+    y = df[label]
+
+    unify_data(X, y)
 
 
 def test_unify_list_data():
